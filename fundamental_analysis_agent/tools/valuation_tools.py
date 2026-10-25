@@ -1,10 +1,11 @@
 """DCF scenario calculator and peer-multiple retrieval."""
 from functools import lru_cache
-from .financial_tools import get_company_info
+from .financial_tools import fetch_snapshot
 
-@lru_cache(maxsize=128)
+
+@lru_cache(maxsize=64)
 def get_peer_multiples(ticker: str) -> dict:
-    info = get_company_info(ticker)
+    info = fetch_snapshot(ticker)
     sector = (info.get("sector") or "").lower()
     groups = {
         "technology": ["MSFT", "GOOGL", "AAPL", "ORCL", "IBM"],
@@ -18,7 +19,7 @@ def get_peer_multiples(ticker: str) -> dict:
     for symbol in groups.get(sector, []):
         if symbol == ticker.upper():
             continue
-        p = get_company_info(symbol)
+        p = fetch_snapshot(symbol)
         if p:
             results.append({"ticker": symbol, "company": p.get("longName"),
                             "trailing_pe": p.get("trailingPE"), "forward_pe": p.get("forwardPE"),

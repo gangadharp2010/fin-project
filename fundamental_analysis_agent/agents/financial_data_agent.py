@@ -1,23 +1,29 @@
-import json
-from ..tools import financial_tools as ft
 from ..llm_client import ask_llm
+from ..tools.financial_tools import compact_statement_context
 
 class FinancialDataAgent:
     name = "FinancialDataAgent"
 
-    def run(self, ticker):
-        company = ft.get_company_info(ticker)
-        statements = {
-            "income_statement": ft.get_income_statement(ticker),
-            "balance_sheet": ft.get_balance_sheet(ticker),
-            "cash_flow_statement": ft.get_cash_flow_statement(ticker),
-        }
-        ratios = ft.compute_key_ratios(ticker)
+    def run(self, snapshot: dict) -> dict:
+        print(      "DEBUG FinancialDataAgent:",        type(snapshot).__name__,    )
+        
+        if not isinstance(snapshot, dict):
+            raise TypeError(
+                f"Expected snapshot dict, got {type(snapshot).__name__}. "
+                "Check orchestrator.py."
+            )
+
+        compact = compact_statement_context(snapshot)
+
         analysis = ask_llm(
-            "Act as a junior financial analyst. Summarize reported revenue, profitability, "
-            "cash flow, margins and ROE. Do not infer trends from a single period.",
-            f"Ticker: {ticker}\nCompany: {json.dumps(company, default=str)}\n"
-            f"Statements: {json.dumps(statements, default=str)}\nRatios: {json.dumps(ratios, default=str)}"
+            "Summarize financial health, revenue, profitability, "
+            "cash flow, margins and ROE. Use only supplied data. "
+            "Never invent missing financial values.",
+            str(compact),
         )
-        return {"agent": self.name, "company_info": company, "statements": statements,
-                "key_ratios": ratios, "analysis": analysis}
+
+        return {
+            "agent": self.name,
+            "key_ratios": snapshot.get("key_ratios", {}),
+            "analysis": analysis,
+        }

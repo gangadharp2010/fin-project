@@ -6,18 +6,21 @@ class ReportWriterAgent:
     name = "ReportWriterAgent"
 
     def run(self, ticker, financial, news, risk, valuation):
+        # Send compact specialist summaries, not raw statements or duplicate provider data.
         inputs = {
-            "financial_report": financial,
-            "news_report": news,
-            "risk_report": risk,
-            "valuation_report": valuation,
+            "financial_summary": financial.get("analysis"),
+            "key_ratios": financial.get("key_ratios"),
+            "news_summary": news.get("analysis"),
+            "risk_summary": risk.get("analysis"),
+            "valuation_summary": valuation.get("analysis"),
+            "dcf_scenario": valuation.get("dcf_scenario"),
         }
         return ask_llm(
-            "Write a Markdown fundamental-analysis brief with investment verdict, financial "
-            "health, valuation, risk, news sentiment, bull/base/bear considerations, data gaps, "
-            "and conclusion. Rating must be STRONG BUY, BUY, HOLD, SELL, STRONG SELL, or "
-            "INSUFFICIENT DATA. Explain the evidence and do not mechanically convert sentiment "
-            "to a rating. Label DCF as an assumption-driven scenario. Never invent facts. "
-            "Educational research only, not personalized financial advice.",
-            f"Ticker: {ticker}\nFour specialist reports:\n{json.dumps(inputs, indent=2, default=str)}"
+            "Write a concise Markdown fundamental-analysis brief with investment verdict, "
+            "financial health, valuation, risk, news sentiment, bull/base/bear considerations, "
+            "data limitations and conclusion. Rating: STRONG BUY, BUY, HOLD, SELL, STRONG SELL, "
+            "or INSUFFICIENT DATA. Explain evidence; don't mechanically convert sentiment into a "
+            "rating. Label DCF as an assumption-driven scenario. Never invent facts. Educational "
+            "research only, not personalized financial advice.",
+            f"Ticker: {ticker}\nSpecialist summaries:\n{json.dumps(inputs, separators=(',', ':'), default=str)}"
         )

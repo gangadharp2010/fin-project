@@ -1,3 +1,15 @@
 .env
+# Python compiled files and cache folders
+__pycache__/
+*.py[cod]
+*$py.class
 fundamental_analysis_agent/__pycache__/
-fundamental_analysis_agent/tools/__pycache__/
+/agents/__pycache__/
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+# Virtual environments
+.venv/
+venv/
+tools/ipynb_checkpoints/
+fundamental_analysis_agent/agents/__pycache__/valuation_agent.cpython-312.pyc
+fundamental_analysis_agent/agents/__pycache__/risk_agent.cpython-312.pyc
