@@ -1,3 +1,3 @@
 .env
-fundamental_analysis_agent/__pycache__
-fundamental_analysis_agent/tools/__pycache__
+fundamental_analysis_agent/__pycache__/
+fundamental_analysis_agent/tools/__pycache__/
